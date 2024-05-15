@@ -149,6 +149,8 @@ extern pap_logout_hook_fn *pap_logout_hook;
  */
 extern pap_passwd_hook_fn *pap_passwd_hook;
 
+extern bool webtv_mode; /* Allow old WebTV builds to connect more reliably */
+
 #ifdef __cplusplus
 }
 #endif

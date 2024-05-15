@@ -122,6 +122,8 @@ extern ip_down_hook_fn *ip_down_hook;
 typedef void (ip_choose_hook_fn)(uint32_t *);
 extern ip_choose_hook_fn *ip_choose_hook;
 
+extern bool webtv_mode; /* Allow old WebTV builds to connect more reliably */
+
 #ifdef __cplusplus
 }
 #endif

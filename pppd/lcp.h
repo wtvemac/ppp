@@ -145,6 +145,8 @@ void lcp_sprotrej(int, unsigned char *, int);	/* send protocol reject */
 
 extern struct protent lcp_protent;
 
+extern bool webtv_mode; /* Allow old WebTV builds to connect more reliably */
+
 /* Default number of times we receive our magic number from the peer
    before deciding the link is looped-back. */
 #define DEFLOOPBACKFAIL	10

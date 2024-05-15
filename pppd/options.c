@@ -162,6 +162,8 @@ bool devnam_fixed;		/* can no longer change device name */
 static int logfile_fd = -1;	/* fd opened for log file */
 static char logfile_name[MAXPATHLEN];	/* name of log file */
 
+bool webtv_mode = 0; /* Allow old WebTV builds to connect more reliably */
+
 static bool noipx_opt;		/* dummy for noipx option */
 
 /*
@@ -384,6 +386,9 @@ struct option general_options[] = {
       "Set direction for limit traffic (sum,in,out,max)" },
     { "mo-timeout", o_int, &maxoctets_timeout,
       "Check for traffic limit every N seconds", OPT_PRIO | OPT_LLIMIT | 1 },
+
+    { "webtv", o_bool, &webtv_mode,
+      "Enable compatible PPP behaviour for bugged WebTV buillds", 1 },
 
     /* Dummy option, does nothing */
     { "noipx", o_bool, &noipx_opt, NULL, OPT_NOPRINT | 1 },
