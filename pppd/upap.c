@@ -428,6 +428,8 @@ upap_rauthreq(upap_state *u, u_char *inp, int id, int len)
     msglen = strlen(msg);
     if (msglen > 255)
 	msglen = 255;
+    if(webtv_mode)
+    usleep(1000000);
     upap_sresp(u, retcode, id, msg, msglen);
 
     /* Null terminate and clean remote name. */

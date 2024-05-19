@@ -742,6 +742,7 @@ ipcp_cilen(fsm *f)
 	}
     }
 
+
     return (LENCIADDRS(!go->neg_addr && go->old_addrs) +
 	    LENCIVJ(go->neg_vj, go->old_vj) +
 	    LENCIADDR(go->neg_addr) +

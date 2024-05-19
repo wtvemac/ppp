@@ -166,6 +166,8 @@ void fsm_sdata (fsm *, int, int, unsigned char *, int);
  */
 extern int peer_mru[];		/* currently negotiated peer MRU (per unit) */
 
+extern bool webtv_mode; /* Allow old WebTV builds to connect more reliably */
+
 #ifdef __cplusplus
 }
 #endif

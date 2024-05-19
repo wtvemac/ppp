@@ -439,6 +439,8 @@ fsm_rconfreq(fsm *f, int id, u_char *inp, int len)
     else
 	code = CONFACK;
 
+    if(webtv_mode && code == CONFNAK) // This usually hits on the peer address NAK, adds delay for older WebTV builds.
+    usleep(1000000);
     /* send the Ack, Nak or Rej to the peer */
     fsm_sdata(f, code, id, inp, len);
 
