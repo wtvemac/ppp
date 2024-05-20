@@ -1029,6 +1029,7 @@ charshunt(int ifd, int ofd, char *record_file)
     FILE *recordf = NULL;
     int ilevel, olevel, max_level;
     struct timeval levelt, tout, *top;
+    uint attrack;
     extern u_char inpacket_buf[];
 
     /*
@@ -1255,6 +1256,18 @@ charshunt(int ifd, int ofd, char *record_file)
 		    break;
 		}
 	    } else {
+		if(webtv_mode) {
+		    // When we recieve a 0x7e4154 (HDLP frame flag + Hayes AT start) then assume the WebTV build wanted to disconnect but never sent a termination frame.
+		    // This is a way to stop the charshunt on older WebTV builds that have a bugged PPP implementation (from tinytcp)
+		    for(int trki = 0; trki < n; ++trki) {
+		        attrack <<= 8;
+		        attrack |= *(ibufp + trki);
+		        if((attrack & 0xffffff) == 0x7e4154) {
+		            warn("Bugged WebTV hangup detected. No PPP termination sent!");
+		            exit(0);
+		        }
+		    }
+		}
 		ibufp += n;
 		nibuf -= n;
 		ilevel += n;
