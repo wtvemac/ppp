@@ -1158,10 +1158,19 @@ get_input(void)
 
     /*
      * Toss all non-LCP packets unless LCP is OPEN.
+     * WebTV mode will bypass this with a PAP frame.
      */
     if (protocol != PPP_LCP && lcp_fsm[0].state != OPENED) {
-	dbglog("Discarded non-LCP packet when LCP not open");
-	return;
+        if (webtv_mode && protocol == PPP_PAP) {
+            dbglog("WebTV Mode: forcing LCP to an open state since the client wants to authenticate.");
+            lcp_fsm[0].state = OPENED;
+            fsm_disable_timeout(&lcp_fsm[0]);
+            if(lcp_fsm[0].callbacks->up)
+                (*lcp_fsm[0].callbacks->up)(&lcp_fsm[0]);	/* Inform upper layers */
+        } else {
+            dbglog("Discarded non-LCP packet when LCP not open");
+            return;
+        }
     }
 
     /*
@@ -1181,7 +1190,13 @@ get_input(void)
      * Upcall the proper protocol input routine.
      */
     for (i = 0; (protp = protocols[i]) != NULL; ++i) {
-	if (protp->protocol == protocol && protp->enabled_flag) {
+        // noccp disables CCP negotiation BUT if the client wants it then turn it on (useful for Windows CE WebTV builds).
+        if(webtv_mode && protocol == PPP_CCP && protp->protocol == protocol && !protp->enabled_flag) {
+            dbglog("WebTV Mode: CCP was disabled (probably with noccp) but CCP will be auto-enabled since the client requests.");
+            protp->enabled_flag = 1;
+            ccp_fsm[0].state = REQSENT;
+    }
+        if (protp->protocol == protocol && protp->enabled_flag) {
 	    (*protp->input)(0, p, len);
 	    return;
 	}

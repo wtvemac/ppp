@@ -394,6 +394,15 @@ fsm_input(fsm *f, u_char *inpacket, int l)
     }
 }
 
+/*
+ * fsm_disable_timeout - Disables retransmit loop.
+ * Used to disable LCP retransmissions to advance connection state for the WebTV.
+ */
+void
+fsm_disable_timeout(fsm *f)
+{
+	UNTIMEOUT(fsm_timeout, f);
+}
 
 /*
  * fsm_rconfreq - Receive Configure-Request.
@@ -417,6 +426,7 @@ fsm_rconfreq(fsm *f, int id, u_char *inp, int len)
 	if( f->callbacks->down )
 	    (*f->callbacks->down)(f);	/* Inform upper layers */
 	fsm_sconfreq(f, 0);		/* Send initial Configure-Request */
+
 	f->state = REQSENT;
 	break;
 
@@ -439,7 +449,8 @@ fsm_rconfreq(fsm *f, int id, u_char *inp, int len)
     else
 	code = CONFACK;
 
-    if(webtv_mode && code == CONFNAK) // This usually hits on the peer address NAK, adds delay for older WebTV builds.
+    // This usually hits on the peer address NAK, adds delay for older WebTV builds.
+    if(webtv_mode && code == CONFNAK)
     usleep(1000000);
     /* send the Ack, Nak or Rej to the peer */
     fsm_sdata(f, code, id, inp, len);
@@ -490,6 +501,12 @@ fsm_rconfack(fsm *f, int id, u_char *inp, int len)
     case REQSENT:
 	f->state = ACKRCVD;
 	f->retransmits = f->maxconfreqtransmits;
+	// WebTV Windows CE can send send LCP acks and reqs in a different order than normal.
+	if(webtv_mode && (f->protocol == PPP_LCP || f->protocol == PPP_IPCP)) {
+		UNTIMEOUT(fsm_timeout, f);	/* Cancel timeout */
+		if(f->protocol == PPP_LCP && f->callbacks->up)
+			(*f->callbacks->up)(f);	/* Inform upper layers */
+	}
 	break;
 
     case ACKRCVD:

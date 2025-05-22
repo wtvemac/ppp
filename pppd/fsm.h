@@ -142,10 +142,16 @@ typedef struct fsm_callbacks {
 /*
  * Timeouts.
  */
-#define DEFTIMEOUT	3	/* Timeout time in seconds */
-#define DEFMAXTERMREQS	2	/* Maximum Terminate-Request transmissions */
-#define DEFMAXCONFREQS	10	/* Maximum Configure-Request transmissions */
-#define DEFMAXNAKLOOPS	5	/* Maximum number of nak loops */
+// Original:
+ //#define DEFTIMEOUT	3	/* Timeout time in seconds */
+//#define DEFMAXTERMREQS	2	/* Maximum Terminate-Request transmissions */
+//#define DEFMAXCONFREQS	10	/* Maximum Configure-Request transmissions */
+//#define DEFMAXNAKLOOPS	5	/* Maximum number of nak loops */
+// WebTV changes, allows more chances for the client to listen up:
+#define DEFTIMEOUT	6	/* Timeout time in seconds */
+#define DEFMAXTERMREQS	4	/* Maximum Terminate-Request transmissions */
+#define DEFMAXCONFREQS	50	/* Maximum Configure-Request transmissions */
+#define DEFMAXNAKLOOPS	20	/* Maximum number of nak loops */
 
 
 /*
@@ -157,6 +163,7 @@ void fsm_lowerdown (fsm *);
 void fsm_open (fsm *);
 void fsm_close (fsm *, char *);
 void fsm_input (fsm *, unsigned char *, int);
+void fsm_disable_timeout(fsm *f);
 void fsm_protreject (fsm *);
 void fsm_sdata (fsm *, int, int, unsigned char *, int);
 
