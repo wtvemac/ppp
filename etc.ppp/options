@@ -1,1 +1,23 @@
-lock
+# Debugging setup
+
+kdebug 4
+debug
+show-password
+record /tmp/test.pcap
+
+# General process flow setup
+
+idle 3600
+local
+
+# Protocol setup
+
+webtv
+passive
+require-pap
+receive-all
+nomagic
+noipv6
+noipx
+noccp
+ms-dns 9.9.9.9
