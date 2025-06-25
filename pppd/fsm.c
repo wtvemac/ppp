@@ -275,7 +275,7 @@ fsm_timeout(void *arg)
 {
     fsm *f = (fsm *) arg;
 
-    switch (f->state) {
+	switch (f->state) {
     case CLOSING:
     case STOPPING:
 	if( f->retransmits <= 0 ){
@@ -302,12 +302,23 @@ fsm_timeout(void *arg)
 	    f->state = STOPPED;
 	    if( (f->flags & OPT_PASSIVE) == 0 && f->callbacks->finished )
 		(*f->callbacks->finished)(f);
-
 	} else {
 	    /* Retransmit the configure-request */
 	    if (f->callbacks->retransmit)
 		(*f->callbacks->retransmit)(f);
-	    fsm_sconfreq(f, 1);		/* Re-send Configure-Request */
+		// This is useful for Windows CE WebTV builds. Sometimes the client doesn't go through the correct process to connect.
+		if (webtv_mode && f->protocol == PPP_IPCP && ((f->maxconfreqtransmits - f->retransmits) == 2))
+		{
+			dbglog("WebTV Mode: forcing IPCP to an open state. We timed out waiting for a response twice. Looks like a bugged client.");
+			f->state = OPENED;
+			UNTIMEOUT(fsm_timeout, f);	/* Cancel timeout */
+			if(f->callbacks->up)
+				(*f->callbacks->up)(f);	/* Inform upper layers */
+			}
+		else
+		{
+			fsm_sconfreq(f, 1);		/* Re-send Configure-Request */
+		}
 	    if( f->state == ACKRCVD )
 		f->state = REQSENT;
 	}
