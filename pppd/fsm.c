@@ -307,7 +307,7 @@ fsm_timeout(void *arg)
 	    if (f->callbacks->retransmit)
 		(*f->callbacks->retransmit)(f);
 		// This is useful for Windows CE WebTV builds. Sometimes the client doesn't go through the correct process to connect.
-		if (webtv_mode && f->protocol == PPP_IPCP && ((f->maxconfreqtransmits - f->retransmits) == 2))
+		if (webtv_mode && f->protocol == PPP_IPCP && ((f->maxconfreqtransmits - f->retransmits) == 10))
 		{
 			dbglog("WebTV Mode: forcing IPCP to an open state. We timed out waiting for a response twice. Looks like a bugged client.");
 			f->state = OPENED;
